@@ -12,9 +12,13 @@ import {
   List,
   Divider,
   ListItem,
+  Button,
 } from "@material-ui/core";
+import SendIcon from "@material-ui/icons/Send";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { getFruit } from "../helpers/apiMethods";
+import { makeSalad } from "../helpers/dataMethods";
+
+import SaladModal from "./SaladModal";
 
 const drawerWidth = 300;
 
@@ -42,31 +46,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SideBar(props) {
   const classes = useStyles();
-  const [ingredients, setIngredients] = useState([]);
   const [newSalad, setNewSalad] = useState({});
-
-  useEffect(() => {
-    if (props.ingredients.length > 0) {
-      if (ingredients.length > 1) {
-        const existingIngsNames = ingredients.map((ing) => ing.name);
-        console.log(existingIngsNames);
-        const ingToAdd = props.ingredients.find(
-          (ing) => !existingIngsNames.includes(ing.name)
-        );
-        setIngredients([...ingredients, ingToAdd]);
-      } else {
-        setIngredients(props.ingredients);
-      }
-    }
-  }, [props.ingredients]);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const handleGrammsChange = (e) => {
-    console.log(Number.isNaN(e.target.value), e.target.value);
+    const { ingredients } = props;
     const ingToChange = ingredients.find((ing) => ing.name === e.target.id);
     const newIngredients = ingredients.map((ing) => {
       if (ing === ingToChange) {
         if (!e.target.value) {
-          console.log("not a number");
           return {
             ...ing,
             gramms: 0,
@@ -81,98 +69,98 @@ export default function SideBar(props) {
         return ing;
       }
     });
-    console.log(ingToChange);
-    setIngredients(newIngredients);
+
+    props.updateIngredients(newIngredients);
+  };
+
+  const handleRemove = (e) => {
+    e.stopPropagation();
+    const ingToRemove = props.ingredients.find(
+      (ing) => ing.name === e.currentTarget.id
+    );
+
+    props.removeIngredient(ingToRemove);
   };
 
   const handleMakeSaladClick = async () => {
-    let gramms = 0;
-    let calories = 0;
-    let carbs = 0;
-    let fat = 0;
-    let sugar = 0;
-    for (let ing of ingredients) {
-      const ingNutritions = await calcIngNutritions(ing);
-      gramms += ing.gramms;
-      calories += ingNutritions.calories;
-      carbs += ingNutritions.carbs;
-      fat += ingNutritions.fat;
-      sugar += ingNutritions.sugar;
-    }
-    setNewSalad({
-      gramms: gramms,
-      calories: parseFloat(calories.toFixed(2)),
-      carbs: parseFloat(carbs.toFixed(2)),
-      fat: parseFloat(fat.toFixed(2)),
-      sugar: parseFloat(sugar.toFixed(2)),
-    });
-    console.log(newSalad);
+    let newSalad = await makeSalad(props.ingredients);
+    setNewSalad(newSalad);
+    handleModalOpen();
   };
 
-  const calcIngNutritions = async (ing) => {
-    const ingData = await getFruit(ing.name);
-    const grammsAdded = ing.gramms;
-    const ingNutritions = {};
-    ingNutritions.gramms = parseFloat(grammsAdded);
-    ingNutritions.calories = parseFloat(
-      (ingData.fat_total_g * grammsAdded) / 100
-    );
-    ingNutritions.carbs = parseFloat(
-      (ingData.carbohydrates_total_g * grammsAdded) / 100
-    );
-    ingNutritions.fat = parseFloat((ingData.fat_total_g * grammsAdded) / 100);
-
-    ingNutritions.sugar = parseFloat((ingData.sugar_g * grammsAdded) / 100);
-    return ingNutritions;
+  const handleModalOpen = () => {
+    setModalIsOpen(true);
   };
+
+  const handleModalClose = () => {
+    setModalIsOpen(false);
+  };
+
   return (
-    <Drawer
-      className={classes.drawer}
-      variant="persistent"
-      anchor="right"
-      open={props.open}
-      classes={{
-        paper: classes.drawerPaper,
-      }}
-    >
-      <div className={classes.drawerHeader}>
-        <Typography variant="h5" alignCenter>
-          Your Ingredients:
-        </Typography>
-      </div>
-      <Divider />
-      <List>
-        {props.ingredients.length > 0 &&
-          props.ingredients.map((ing) => (
-            <ListItem dense>
-              <ListItemAvatar>
-                <Avatar
-                  alt={`${ing} img`}
-                  src={`${process.env.PUBLIC_URL}/assets/images/${ing.name}.png`}
+    <>
+      <Drawer
+        className={classes.drawer}
+        variant="persistent"
+        anchor="right"
+        open={props.open}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        <div className={classes.drawerHeader}>
+          <Typography variant="h5">Your Ingredients:</Typography>
+        </div>
+        <Divider />
+        <List>
+          {props.ingredients.length > 0 &&
+            props.ingredients.map((ing) => (
+              <ListItem dense key={ing.name}>
+                <ListItemAvatar>
+                  <Avatar
+                    alt={`${ing} img`}
+                    src={`${process.env.PUBLIC_URL}/assets/images/${ing.name}.png`}
+                  />
+                </ListItemAvatar>
+                <TextField
+                  className={classes.grammsInput}
+                  id={ing.name}
+                  type="number"
+                  size="small"
+                  defaultValue={0}
+                  onChange={handleGrammsChange}
                 />
-              </ListItemAvatar>
-              <TextField
-                className={classes.grammsInput}
-                id={ing.name}
-                type="number"
-                size="small"
-                defaultValue={0}
-                onChange={handleGrammsChange}
-              />
-              <Box mr={1.5}>
-                <Typography>(g)</Typography>
-              </Box>
-              <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="delete">
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-      </List>
-      <IconButton>
-        <DeleteIcon onClick={handleMakeSaladClick} />
-      </IconButton>
-    </Drawer>
+                <Box mr={1.5}>
+                  <Typography>(g)</Typography>
+                </Box>
+                <ListItemSecondaryAction>
+                  <IconButton
+                    id={ing.name}
+                    edge="end"
+                    aria-label="delete"
+                    onClick={handleRemove}
+                  >
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+        </List>
+        <Box textAlign="center">
+          <Button
+            onClick={handleMakeSaladClick}
+            variant="outlined"
+            color="primary"
+            endIcon={<SendIcon />}
+          >
+            Make me a salad
+          </Button>
+        </Box>
+      </Drawer>
+      <SaladModal
+        isOpen={modalIsOpen}
+        saladInfo={newSalad}
+        handleClose={handleModalClose}
+      />
+    </>
   );
 }

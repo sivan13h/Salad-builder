@@ -12,7 +12,7 @@ import {
   Box,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import { getFruit } from "../helpers/apiMethods";
+import { getFruit, checkIfExistLocally } from "../helpers/dataMethods";
 
 export default function SearchForm(props) {
   const [searchValue, setSearchValue] = useState("");
@@ -26,16 +26,21 @@ export default function SearchForm(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setCardIsShowing(false);
 
-    getFruitData(searchValue);
+    if (checkIfExistLocally(searchValue)) {
+      setIsLoading(true);
+      setCardIsShowing(false);
+      getFruitData(searchValue);
+    } else {
+      alert("Unforunately we don't have information about this item");
+      setCardIsShowing(false);
+    }
+
     setSearchValue("");
   };
 
   const getFruitData = async (fruit) => {
     const fruitData = await getFruit(fruit);
-    console.log(fruitData);
     setCardIsShowing(true);
     setIsLoading(false);
     setCurrentFruitData(fruitData);
