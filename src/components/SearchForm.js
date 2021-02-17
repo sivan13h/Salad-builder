@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ResultsCard from "../components/ResultsCard";
 import {
   Typography,
@@ -14,10 +14,15 @@ import SearchIcon from "@material-ui/icons/Search";
 import { getFruit, checkIfExistLocally } from "../helpers/dataMethods";
 
 export default function SearchForm(props) {
+  const searchRef = useRef();
   const [searchValue, setSearchValue] = useState("");
   const [cardIsShowing, setCardIsShowing] = useState(false);
   const [currentFruitData, setCurrentFruitData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    searchRef.current.focus();
+  }, []);
 
   const handleChange = (e) => {
     setSearchValue(e.target.value);
@@ -65,6 +70,7 @@ export default function SearchForm(props) {
               <InputLabel htmlFor="my-input">Fruit / Vegetable</InputLabel>
               <Input
                 required
+                inputRef={searchRef}
                 id="my-input"
                 onChange={handleChange}
                 aria-describedby="my-helper-text"
