@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
+import { IngsContext } from "../contexts/Ings.Context";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Box,
@@ -48,9 +49,11 @@ export default function SideBar(props) {
   const classes = useStyles();
   const [newSalad, setNewSalad] = useState({});
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const { ingredients, updateIngredients, removeIngredient } = useContext(
+    IngsContext
+  );
 
   const handleGrammsChange = (e) => {
-    const { ingredients } = props;
     const ingToChange = ingredients.find((ing) => ing.name === e.target.id);
     const newIngredients = ingredients.map((ing) => {
       if (ing === ingToChange) {
@@ -70,20 +73,20 @@ export default function SideBar(props) {
       }
     });
 
-    props.updateIngredients(newIngredients);
+    updateIngredients(newIngredients);
   };
 
   const handleRemove = (e) => {
     e.stopPropagation();
-    const ingToRemove = props.ingredients.find(
+    const ingToRemove = ingredients.find(
       (ing) => ing.name === e.currentTarget.id
     );
 
-    props.removeIngredient(ingToRemove);
+    removeIngredient(ingToRemove);
   };
 
   const handleMakeSaladClick = async () => {
-    let newSalad = await makeSalad(props.ingredients);
+    let newSalad = await makeSalad(ingredients);
     setNewSalad(newSalad);
     handleModalOpen();
   };
@@ -112,8 +115,8 @@ export default function SideBar(props) {
         </div>
         <Divider />
         <List>
-          {props.ingredients.length > 0 &&
-            props.ingredients.map((ing) => (
+          {ingredients.length > 0 &&
+            ingredients.map((ing) => (
               <ListItem dense key={ing.name}>
                 <ListItemAvatar>
                   <Avatar

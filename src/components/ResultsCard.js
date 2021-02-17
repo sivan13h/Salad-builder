@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { IngsContext } from "../contexts/Ings.Context";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Card,
@@ -17,7 +18,7 @@ import {
 import { green } from "@material-ui/core/colors";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   tableBody: {
     padding: 0,
   },
@@ -25,8 +26,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ResultsCard(props) {
   const classes = useStyles();
+  const { addIngredient } = useContext(IngsContext);
+
   const handleAddClick = () => {
-    props.addIngredient({ name: props.data.name, gramms: 0 });
+    addIngredient({ name: props.data.name, gramms: 0 });
     props.openSideBar();
   };
   const { name } = props.data;

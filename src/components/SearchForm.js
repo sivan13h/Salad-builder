@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import ResultsCard from "../components/ResultsCard";
 import {
   Typography,
@@ -48,7 +47,11 @@ export default function SearchForm(props) {
 
   return (
     <div>
-      <Typography variant="h4">Search a Fruit or a Vegetable</Typography>
+      <Typography variant="h6">
+        Find out the nutritions of your favorite salads !
+      </Typography>
+      <br></br>
+      <Typography variant="h4">First, Search a Fruit or a Vegetable</Typography>
       <form onSubmit={handleSubmit}>
         <Grid
           container
@@ -82,11 +85,7 @@ export default function SearchForm(props) {
         </Grid>
       </form>
       {cardIsShowing && currentFruitData && (
-        <ResultsCard
-          data={currentFruitData}
-          openSideBar={props.openSideBar}
-          addIngredient={props.addIngredient}
-        />
+        <ResultsCard data={currentFruitData} openSideBar={props.openSideBar} />
       )}
       {isLoading && (
         <Box mt={3}>

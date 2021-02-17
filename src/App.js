@@ -48,27 +48,9 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [ingredients, setIngredients] = useState([]);
 
   const openSideBar = () => {
     setOpen(true);
-  };
-
-  const addIngredient = (ingredient) => {
-    if (ingredients.some((ing) => ing.name === ingredient.name)) {
-      alert("this ingredient already exist in you salad!");
-    } else {
-      setIngredients([...ingredients, ingredient]);
-    }
-  };
-
-  const updateIngredients = (updatedIngredients) => {
-    setIngredients(updatedIngredients);
-  };
-
-  const removeIngredient = (ingredient) => {
-    const filteredIngredients = ingredients.filter((ing) => ing !== ingredient);
-    setIngredients(filteredIngredients);
   };
 
   return (
@@ -86,19 +68,11 @@ export default function App() {
               >
                 <Paper elevation={3}>
                   <Box p={2}>
-                    <SearchForm
-                      openSideBar={openSideBar}
-                      addIngredient={addIngredient}
-                    />
+                    <SearchForm openSideBar={openSideBar} />
                   </Box>
                 </Paper>
               </main>
-              <SideBar
-                ingredients={ingredients}
-                open={open}
-                updateIngredients={updateIngredients}
-                removeIngredient={removeIngredient}
-              />
+              <SideBar open={open} />
             </div>
           </Box>
         </Container>
