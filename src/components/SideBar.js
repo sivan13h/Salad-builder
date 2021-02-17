@@ -72,7 +72,6 @@ export default function SideBar(props) {
         return ing;
       }
     });
-
     updateIngredients(newIngredients);
   };
 
@@ -81,7 +80,6 @@ export default function SideBar(props) {
     const ingToRemove = ingredients.find(
       (ing) => ing.name === e.currentTarget.id
     );
-
     removeIngredient(ingToRemove);
   };
 
@@ -105,7 +103,7 @@ export default function SideBar(props) {
         className={classes.drawer}
         variant="persistent"
         anchor="right"
-        open={props.open}
+        open={props.sidebarIsOpen}
         classes={{
           paper: classes.drawerPaper,
         }}

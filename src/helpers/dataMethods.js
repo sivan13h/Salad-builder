@@ -86,8 +86,15 @@ const makeSalad = async (ingredients) => {
     salad.sugar += ingNutritions.sugar;
     salad.protein += ingNutritions.protein;
   }
-  console.log(salad);
-  return salad;
+  let fixedSalad = {
+    gramms: salad.gramms,
+    calories: salad.calories.toFixed(2),
+    carbs: salad.carbs.toFixed(2),
+    fat: salad.fat.toFixed(2),
+    sugar: salad.sugar.toFixed(2),
+    protein: salad.protein.toFixed(2),
+  };
+  return fixedSalad;
 };
 
 const checkIfExistLocally = (ing) => {

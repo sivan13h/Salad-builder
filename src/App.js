@@ -9,6 +9,8 @@ import "./App.css";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 
+const drawerWidth = 300;
+
 const theme = createMuiTheme({
   typography: {
     fontFamily: [
@@ -20,8 +22,6 @@ const theme = createMuiTheme({
     ].join(","),
   },
 });
-
-const drawerWidth = 300;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,10 +47,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function App() {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
 
   const openSideBar = () => {
-    setOpen(true);
+    setSidebarIsOpen(true);
   };
 
   return (
@@ -63,7 +63,7 @@ export default function App() {
               <CssBaseline />
               <main
                 className={clsx(classes.content, {
-                  [classes.contentShift]: open,
+                  [classes.contentShift]: sidebarIsOpen,
                 })}
               >
                 <Paper elevation={3}>
@@ -72,7 +72,7 @@ export default function App() {
                   </Box>
                 </Paper>
               </main>
-              <SideBar open={open} />
+              <SideBar sidebarIsOpen={sidebarIsOpen} />
             </div>
           </Box>
         </Container>
