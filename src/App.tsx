@@ -1,7 +1,7 @@
-import { React, useState } from "react";
-import Topbar from "./components/Topbar";
-import SearchForm from "./components/SearchForm";
-import SideBar from "./components/SideBar";
+import React, { useState, useEffect } from "react";
+import { Topbar } from "./components/Topbar";
+import { SearchForm } from "./components/SearchForm";
+import { SideBar } from "./components/SideBar";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Container, Paper, CssBaseline } from "@material-ui/core";
@@ -47,16 +47,34 @@ const useStyles = makeStyles((theme) => ({
 
 export default function App() {
   const classes = useStyles();
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  const [sidebarIsOpen, setSidebarIsOpen] = useState<boolean>(false);
+  const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
+  const [menuIsShowing, setMenuIsShowing] = useState<boolean>(false);
+
+  const showMenu = () => {
+    if (!menuIsShowing) {
+      setMenuIsShowing(true);
+    }
+  };
 
   const openSideBar = () => {
     setSidebarIsOpen(true);
   };
 
+  useEffect(() => {
+    const handleResizeWindow = () => setScreenWidth(window.innerWidth);
+    // subscribe to window resize event "onComponentDidMount"
+    window.addEventListener("resize", handleResizeWindow);
+    return () => {
+      // unsubscribe "onComponentDestroy"
+      window.removeEventListener("resize", handleResizeWindow);
+    };
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <Topbar />
+        <Topbar menuIsShowing={menuIsShowing} />
         <Container>
           <Box p={0}>
             <div className={classes.root}>
@@ -68,7 +86,11 @@ export default function App() {
               >
                 <Paper elevation={3}>
                   <Box p={2}>
-                    <SearchForm openSideBar={openSideBar} />
+                    <SearchForm
+                      openSideBar={openSideBar}
+                      screenWidth={screenWidth}
+                      showMenu={showMenu}
+                    />
                   </Box>
                 </Paper>
               </main>

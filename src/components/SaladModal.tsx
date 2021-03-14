@@ -1,8 +1,10 @@
-import { React, useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 import { Table, TableBody, TableCell, TableRow, Box } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -12,14 +14,33 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   paper: {
+    position: "relative",
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
   },
+  // closeButton: {
+  //   position: "absolute",
+  //   right: "1rem",
+  //   top: "1rem",
+  // },
 }));
 
-export default function SaladModal(props) {
+interface ModalProps {
+  isOpen: boolean;
+  handleClose: () => void;
+  saladInfo: {
+    gramms: number;
+    calories: number;
+    carbs: number;
+    fat: number;
+    sugar: number;
+    protein: number;
+  };
+}
+
+export const SaladModal: React.FC<ModalProps> = (props) => {
   const classes = useStyles();
 
   return (
@@ -38,6 +59,9 @@ export default function SaladModal(props) {
       >
         <Fade in={props.isOpen}>
           <div className={classes.paper}>
+            <IconButton onClick={props.handleClose}>
+              <CloseIcon />
+            </IconButton>
             <h2 id="transition-modal-title">
               Oooo looks Delicious and Healthy!
             </h2>
@@ -88,4 +112,4 @@ export default function SaladModal(props) {
       </Modal>
     </div>
   );
-}
+};

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { IngsContext } from "../contexts/Ings.Context";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -19,7 +19,7 @@ import SendIcon from "@material-ui/icons/Send";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { makeSalad } from "../helpers/dataMethods";
 
-import SaladModal from "./SaladModal";
+import { SaladModal } from "./SaladModal";
 
 const drawerWidth = 300;
 
@@ -45,19 +45,33 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SideBar(props) {
+interface SidebarProps {
+  sidebarIsOpen: boolean;
+}
+
+interface newSalad {
+  gramms: number;
+  calories: number;
+  carbs: number;
+  fat: number;
+  sugar: number;
+  protein: number;
+}
+
+export const SideBar: React.FC<SidebarProps> = (props) => {
   const classes = useStyles();
-  const [newSalad, setNewSalad] = useState({});
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [newSalad, setNewSalad] = useState<newSalad>({} as newSalad);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const { ingredients, updateIngredients, removeIngredient } = useContext(
     IngsContext
   );
 
-  const handleGrammsChange = (e) => {
-    const ingToChange = ingredients.find((ing) => ing.name === e.target.id);
+  const handleGrammsChange = (e: React.SyntheticEvent) => {
+    const target = e.target as HTMLInputElement;
+    const ingToChange = ingredients.find((ing) => ing.name === target.id);
     const newIngredients = ingredients.map((ing) => {
       if (ing === ingToChange) {
-        if (!e.target.value) {
+        if (!target.value) {
           return {
             ...ing,
             gramms: 0,
@@ -65,7 +79,7 @@ export default function SideBar(props) {
         } else {
           return {
             ...ing,
-            gramms: parseInt(e.target.value),
+            gramms: parseInt(target.value),
           };
         }
       } else {
@@ -75,11 +89,11 @@ export default function SideBar(props) {
     updateIngredients(newIngredients);
   };
 
-  const handleRemove = (e) => {
+  const handleRemove = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     const ingToRemove = ingredients.find(
       (ing) => ing.name === e.currentTarget.id
-    );
+    )!;
     removeIngredient(ingToRemove);
   };
 
@@ -164,4 +178,4 @@ export default function SideBar(props) {
       />
     </>
   );
-}
+};

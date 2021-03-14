@@ -18,23 +18,61 @@ import {
 import { green } from "@material-ui/core/colors";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   tableBody: {
     padding: 0,
   },
+  card: {
+    [theme.breakpoints.down("sm")]: {
+      width: "90%",
+    },
+  },
+  tableCell: {
+    [theme.breakpoints.down("sm")]: {
+      padding: "8px",
+    },
+  },
 }));
 
-export default function ResultsCard(props) {
+interface resultCardProps {
+  data: {
+    name: string;
+    calories: number;
+    carbs: number;
+    fat: number;
+    sugar: number;
+    protein: number;
+  };
+  openSideBar: () => void;
+  showMenu: () => void;
+  screenWidth: number;
+}
+
+interface dataKeys {
+  name: string;
+  calories: number;
+  fat: number;
+  carbs: number;
+  protein: number;
+  sugar: number;
+}
+
+export const ResultsCard: React.FC<resultCardProps> = (props) => {
   const classes = useStyles();
   const { addIngredient } = useContext(IngsContext);
+  const dataKeys = Object.keys(props.data) as (keyof dataKeys)[];
 
   const handleAddClick = () => {
     addIngredient({ name: props.data.name, gramms: 0 });
-    props.openSideBar();
+    if (props.screenWidth >= 768) {
+      props.openSideBar();
+    } else {
+      props.showMenu();
+    }
   };
   const { name } = props.data;
   return (
-    <Box m="1rem auto" width="60%" maxWidth="500px">
+    <Box m="1rem auto" width="60%" maxWidth="500px" className={classes.card}>
       <Card elevation={5}>
         <CardHeader
           avatar={
@@ -52,14 +90,18 @@ export default function ResultsCard(props) {
           <TableContainer>
             <Table aria-label="simple table">
               <TableBody>
-                {Object.keys(props.data).map((key) => {
+                {dataKeys.map((key) => {
                   if (key === "name") {
                     return;
                   } else {
                     return (
                       <TableRow>
-                        <TableCell align="center">{key}</TableCell>
-                        <TableCell align="center">{props.data[key]}</TableCell>
+                        <TableCell align="center" className={classes.tableCell}>
+                          {key}
+                        </TableCell>
+                        <TableCell align="center" className={classes.tableCell}>
+                          {props.data[key]}
+                        </TableCell>
                       </TableRow>
                     );
                   }
@@ -78,4 +120,4 @@ export default function ResultsCard(props) {
       </Card>
     </Box>
   );
-}
+};

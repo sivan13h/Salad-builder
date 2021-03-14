@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import ResultsCard from "../components/ResultsCard";
+import { makeStyles } from "@material-ui/core/styles";
+import { ResultsCard } from "../components/ResultsCard";
 import {
   Typography,
   Button,
@@ -13,22 +14,55 @@ import {
 import SearchIcon from "@material-ui/icons/Search";
 import { getFruit, checkIfExistLocally } from "../helpers/dataMethods";
 
-export default function SearchForm(props) {
-  const searchRef = useRef();
+const useStyles = makeStyles((theme) => ({
+  searchFormHeader: {
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "0.9rem",
+    },
+  },
+  searchSubtitle: {
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "1.2rem",
+    },
+  },
+}));
+
+interface searchFormProps {
+  openSideBar: () => void;
+  showMenu: () => void;
+  screenWidth: number;
+}
+
+interface fruitData {
+  name: string;
+  calories: number;
+  carbs: number;
+  fat: number;
+  sugar: number;
+  protein: number;
+}
+
+export const SearchForm: React.FC<searchFormProps> = (props) => {
+  const classes = useStyles();
+  const searchRef = useRef<HTMLInputElement>(null);
   const [searchValue, setSearchValue] = useState("");
   const [cardIsShowing, setCardIsShowing] = useState(false);
-  const [currentFruitData, setCurrentFruitData] = useState("");
+  const [currentFruitData, setCurrentFruitData] = useState<fruitData>(
+    {} as fruitData
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    searchRef.current.focus();
+    const node = searchRef.current;
+    node?.focus();
   }, []);
 
-  const handleChange = (e) => {
-    setSearchValue(e.target.value);
+  const handleChange = (e: React.SyntheticEvent) => {
+    const target = e.target as HTMLInputElement;
+    setSearchValue(target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     if (checkIfExistLocally(searchValue)) {
@@ -43,20 +77,24 @@ export default function SearchForm(props) {
     setSearchValue("");
   };
 
-  const getFruitData = async (fruit) => {
+  const getFruitData = async (fruit: string) => {
     const fruitData = await getFruit(fruit);
     setCardIsShowing(true);
     setIsLoading(false);
-    setCurrentFruitData(fruitData);
+    if (fruitData !== undefined) {
+      setCurrentFruitData(fruitData);
+    }
   };
 
   return (
     <div>
-      <Typography variant="h6">
+      <Typography variant="h6" className={classes.searchFormHeader}>
         Find out the nutritions of your favorite salads !
       </Typography>
       <br></br>
-      <Typography variant="h4">First, Search a Fruit or a Vegetable</Typography>
+      <Typography variant="h4" className={classes.searchSubtitle}>
+        First, Search a Fruit or a Vegetable
+      </Typography>
       <form onSubmit={handleSubmit}>
         <Grid
           container
@@ -91,7 +129,12 @@ export default function SearchForm(props) {
         </Grid>
       </form>
       {cardIsShowing && currentFruitData && (
-        <ResultsCard data={currentFruitData} openSideBar={props.openSideBar} />
+        <ResultsCard
+          data={currentFruitData}
+          screenWidth={props.screenWidth}
+          openSideBar={props.openSideBar}
+          showMenu={props.showMenu}
+        />
       )}
       {isLoading && (
         <Box mt={3}>
@@ -100,4 +143,4 @@ export default function SearchForm(props) {
       )}
     </div>
   );
-}
+};
